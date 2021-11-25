@@ -1,6 +1,7 @@
 package com.mit.calculator.server;
 
 import com.mit.calculator.*;
+import io.grpc.Status;
 import io.grpc.stub.StreamObserver;
 
 import java.util.ArrayList;
@@ -19,33 +20,28 @@ public class CalculatorServiceImpl extends CalculatorServiceGrpc.CalculatorServi
     @Override
     public void primeNumberDecomposition(PrimeNumberRequest request,
                                          StreamObserver<PrimeNumberResponse> responseStreamObserver) {
-        List<Integer> primes = getPrimes(request.getNumber());
-            primes.forEach(e -> {
-                PrimeNumberResponse response = PrimeNumberResponse.newBuilder()
-                        .setPrimeNumber(e)
-                        .build();
-                responseStreamObserver.onNext(response);
-//                try {
-//                    Thread.sleep(1000L);
-//                } catch (InterruptedException ex) {
-//                    ex.printStackTrace();
-//                }
-            });
+        if (request.getNumber() < 2) {
+             Status status = Status.FAILED_PRECONDITION.withDescription("Invalid number " + request.getNumber());
+            responseStreamObserver.onError(status.asRuntimeException());
+            return;
+        }
+        getPrimes(request.getNumber(), responseStreamObserver);
         responseStreamObserver.onCompleted();
     }
 
 
-    private List<Integer> getPrimes(int num) {
+    private void getPrimes(int num, StreamObserver<PrimeNumberResponse> responseStreamObserver) {
         int k = 2;
-        List<Integer> result = new ArrayList();
+//        List<Integer> result = new ArrayList();
         while (num > 1) {
             if (num % k == 0) {
-                result.add(k);
+                responseStreamObserver.onNext(PrimeNumberResponse.newBuilder()
+                        .setPrimeNumber(k)
+                        .build());
                 num = num / k;
             } else {
                 k = k + 1;
             }
         }
-        return result;
     }
 }

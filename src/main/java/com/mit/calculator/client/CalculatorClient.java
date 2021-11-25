@@ -3,8 +3,7 @@ package com.mit.calculator.client;
 import com.mit.calculator.*;
 import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
-
-import java.util.Iterator;
+import io.grpc.StatusRuntimeException;
 
 public class CalculatorClient {
 
@@ -19,19 +18,23 @@ public class CalculatorClient {
                 .setSecondNum(8)
                 .build();
         SumResponse response = stub.sum(sumRequest);
-        System.out.println(sumRequest.getFirstNum() +
-                " + " +
-                sumRequest.getSecondNum() +
-                " = " +
-                response.getSumResult()
+        System.out.println(new StringBuilder()
+                .append(sumRequest.getFirstNum())
+                .append(" + ")
+                .append(sumRequest.getSecondNum())
+                .append(" = ")
+                .append(response.getSumResult())
         );
 
-        stub.primeNumberDecomposition(
-                     PrimeNumberRequest.newBuilder()
-                        .setNumber(120)
-                        .build()
-        ).forEachRemaining(System.out::println);
-
+        try {
+            stub.primeNumberDecomposition(
+                    PrimeNumberRequest.newBuilder()
+                            .setNumber(2222980)
+                            .build()
+            ).forEachRemaining(System.out::println);
+        } catch (StatusRuntimeException ex) {
+            System.out.println("Error: " + ex.getStatus().getDescription());
+        }
         channel.shutdown();
     }
 }
