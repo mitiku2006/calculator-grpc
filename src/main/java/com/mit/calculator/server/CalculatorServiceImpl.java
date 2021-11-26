@@ -4,9 +4,6 @@ import com.mit.calculator.*;
 import io.grpc.Status;
 import io.grpc.stub.StreamObserver;
 
-import java.util.ArrayList;
-import java.util.List;
-
 public class CalculatorServiceImpl extends CalculatorServiceGrpc.CalculatorServiceImplBase {
     @Override
     public void sum(SumRequest request, StreamObserver<SumResponse> responseObserver) {
@@ -28,6 +25,8 @@ public class CalculatorServiceImpl extends CalculatorServiceGrpc.CalculatorServi
         getPrimes(request.getNumber(), responseStreamObserver);
         responseStreamObserver.onCompleted();
     }
+
+
 
 
     private void getPrimes(int num, StreamObserver<PrimeNumberResponse> responseStreamObserver) {
